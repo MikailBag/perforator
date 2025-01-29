@@ -1,31 +1,34 @@
 # Note: this dockerfile assumes that context contains already built binaries.
 # See docs for details.
 
+ARG prefix=${TARGETOS}-${TARGETARCH}
+
 FROM ubuntu:24.04 AS base
 RUN apt-get update && apt-get install -y ca-certificates
 
 FROM base AS agent
-COPY /agent /perforator/agent
+COPY /${prefix}/agent /perforator/agent
 
 FROM base AS gc
-COPY /gc /perforator/gc
+COPY /${prefix}/gc /perforator/gc
 
 FROM base AS storage
-COPY /storage /perforator/storage
+COPY /${prefix}/storage /perforator/storage
 
 FROM base AS binproc
-COPY /binproc /perforator/binproc
+COPY /${prefix}/binproc /perforator/binproc
 
 FROM base AS proxy
-COPY /proxy /perforator/proxy
+COPY /${prefix}/proxy /perforator/proxy
+# TODO: this will not work on ARM
 COPY /create_llvm_prof /perforator/create_llvm_prof
 
 FROM base AS web
-COPY /web /perforator/web
+COPY /${prefix}/web /perforator/web
 
 FROM base AS migrate
-COPY /migrate /perforator/migrate
+COPY /${prefix}/migrate /perforator/migrate
 
 FROM base AS offline_processing
-COPY /offline_processing /perforator/offline_processing
+COPY /${prefix}/offline_processing /perforator/offline_processing
 

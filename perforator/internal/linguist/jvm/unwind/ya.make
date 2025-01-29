@@ -1,14 +1,11 @@
+IF (NOT CI)
+    RECURSE(sample)
+ENDIF()
+
 RECURSE(
     cheatsheets/tool
     configure
     lib
-)
-
-IF (ARCH_X86_64)
-
-RECURSE(
-    jni
-    sample
 )
 
 ENDIF()
