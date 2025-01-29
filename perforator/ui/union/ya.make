@@ -15,12 +15,18 @@ PEERDIR(
     build/external_resources/pnpm/9.12.3
 )
 
+DEFAULT(NPM_REGISTRY https://registry.npmjs.org/)
+DEFAULT(NPMRC )
+
 RUN_PYTHON3(
     ${CURDIR}/build.py
         --curdir ${CURDIR}
         --bindir ${BINDIR}
         --node-dir $NODEJS_20_18_1_RESOURCE_GLOBAL
         --pnpm-dir $PNPM_9_12_3_RESOURCE_GLOBAL
+    ENV
+        npm_config_registry=${NPM_REGISTRY}
+        npm_config_userconfig=${NPMRC}
     IN
         ${UI_FILES}
     STDOUT ${BINDIR}/stdout

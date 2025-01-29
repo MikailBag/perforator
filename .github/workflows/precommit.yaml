@@ -1,7 +1,5 @@
 on:
-  push:
-    branches: 
-      - main
+  - pull_request_target
 permissions: {} # disable all by default
 jobs:
   run-build:
@@ -98,5 +96,4 @@ jobs:
   #      path: ~/.ya/build
   #  - name: Run ya test
   #    run: ./ya test ./perforator -DCI=github --gc -r --musl
-
 
