@@ -1,0 +1,23 @@
+on:
+  workflow_dispatch: {}
+jobs:
+  release-chart:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHART_RELEASE_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHART_RELEASE_SECRET_KEY }}
+          AWS_DEFAULT_REGION: ru-central-1
+          AWS_ENDPOINT_URL: https://storage.yandexcloud.net
+          BUCKET: ${{ secrets.CHART_BUCKET }}
+        run: |
+          cd perforator/deploy/kubernetes/helm
+          helm dependency update ./perforator
+          helm package ./perforator
+          aws s3 cp s3://${BUCKET}/index.yaml index.yaml
+          aws s3 cp index.yaml s3://${BUCKET}/index.yaml.bak-$(date '+%Y-%M-%d-%H-%M-%S')
+          helm repo index . --merge index.yaml
+          aws s3 cp ./perforator-0.2.7.tgz s3://${BUCKET}/
+          aws s3 cp ./index.yaml s3://${BUCKET}/
+        
