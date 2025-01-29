@@ -37,6 +37,8 @@ jobs:
           name: binaries
       - name: Attach binaries to release
         run: |
+          chmod +x ./cli
+          chmod +x ./migrate
           gh -R ${{ github.repository }} release upload ${{ github.event.release.tag_name }} ./cli ./migrate
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,6 +57,7 @@ jobs:
       - name: Build and push images
         run: |
           function build {
+              chmod +x ./dist/$1
               docker build -f perforator/deploy/docker/Dockerfile.prebuilt --target $1 --push --tag ghcr.io/mikailbag/$1:${{ github.event.release.tag_name }} ./dist
           }
           build agent
