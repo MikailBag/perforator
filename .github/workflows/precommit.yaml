@@ -1,13 +1,17 @@
 on:
+<<<<<<< HEAD
   - workflow_dispatch # TODO(mikailbag): address approval concerns and bring this back
+=======
+  - pull_request_target
+>>>>>>> fb922a027 (better)
 permissions: {} # disable all by default
 jobs:
   run-build:
     permissions:
       id-token: write
       contents: read
-    runs-on: [self-hosted, auto-provisioned]
-    name: Precommit checks
+    runs-on: ubuntu-24.04
+    name: Postcommit checks
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,3 +47,4 @@ jobs:
           env_file_path: ${{ github.workspace }}/job-env
           local_out_path: ${{ github.workspace }}/out
           remote_out_path: /home/builder/.ya/logs
+
