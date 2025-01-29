@@ -30,6 +30,12 @@ jobs:
   build-autofdo:
     runs-on: ubuntu-24.04
     steps:
+      - uses: actions/cache@v4
+        with:
+          path: ./autofdo/build
+          key: v1-${{ github.sha }}
+          restore-keys: |
+            v1-
       - name: Build AutoFDO
         run: |
           sudo apt-get update
@@ -80,7 +86,8 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Build and push images
         run: |
-          cp ./create_llvm_prof ./dist/
+          mv ./create_llvm_prof ./dist/
+          chmod +x ./dist/create_llvm_prof
           function build {
               chmod +x ./dist/$1
               docker build -f perforator/deploy/docker/Dockerfile.prebuilt --target $1 --push --tag ghcr.io/mikailbag/$1:${{ github.event.release.tag_name }} ./dist
