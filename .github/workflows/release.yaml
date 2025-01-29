@@ -40,7 +40,7 @@ jobs:
           cd build
           cmake -DENABLE_TOOL=LLVM -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release ../
           make -j $(nproc) create_llvm_prof
-      - uses: actins/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: autofdo
           path: ./autofdo/build/create_llvm_prof  
@@ -63,6 +63,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - build
+      - build-autofdo
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
