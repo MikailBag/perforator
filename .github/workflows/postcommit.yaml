@@ -2,28 +2,24 @@ name: Postcommit checks
 on:
   push:
     branches:
-      - main
-      - users/MikailBag/ci-remote-build
+      - mainn
 permissions: {} # disable all by default
 jobs:
   run-build:
     permissions:
       id-token: write
       contents: read
-    runs-on: [self-hosted, auto-provisioned]
+    runs-on: ubuntu-24.04
     name: Postcommit checks
     steps:
       - uses: actions/checkout@v4
         with:
           path: code
-      # TODO: replace with WLIF
       - name: Login to YC
         id: login
-        uses: yc-actions/yc-iam-token@v1
+        uses: ./code/.github/actions/yc-login-wlif
         with:
-          yc-key-id: ${{ secrets.YC_KEY_ID }}
-          yc-service-account-id: ${{ secrets.CLOUD_SERVICE_ACCOUNT_ID }}
-          yc-private-key: ${{ secrets.YC_SA_PRIVATE_KEY }}
+          service_account_id: ${{ secrets.CLOUD_SERVICE_ACCOUNT_ID }}
       - name: Prepare inputs
         run: |
           echo "BAZEL_URI=http://bazel-cache.ci-private.internal.perforator.tech:8080" > ${{ github.workspace }}/job-env
@@ -50,3 +46,4 @@ jobs:
         with:
           name: logs
           path: ${{ github.workspace }}/out
+
