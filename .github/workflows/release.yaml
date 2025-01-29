@@ -82,15 +82,33 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: autofdo
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Install Yandex Cloud CLI
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+      - name: Initialize Yandex Cloud CLI
+        env:
+          KEY: ${{ secrets.CONTAINER_REGISTRY_KEY }}
+        run: |
+          ~/yandex-cloud/bin/yc config profile create default
+          echo "${KEY}" > ./key.json
+          ~/yandex-cloud/bin/yc config set service-account-key ./key.json
+          cat key.json | jq ".service_account_id"
+      - name: Log in to GitHub Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Log in to Yandex Container Registry
+        run: |
+          ~/yandex-cloud/bin/yc container registry configure-docker
       - name: Build and push images
         run: |
+          export PATH=~/yandex-cloud/bin:${PATH}
           mv ./create_llvm_prof ./dist/
           chmod +x ./dist/create_llvm_prof
           function build {
               chmod +x ./dist/$1
-              docker build -f perforator/deploy/docker/Dockerfile.prebuilt --target $1 --push --tag ghcr.io/${{ github.repository }}/$1:${{ github.event.release.tag_name }} ./dist
+              docker build -f perforator/deploy/docker/Dockerfile.prebuilt --target $1 --push --tag ghcr.io/mikailbag/$1:${{ github.event.release.tag_name }} ./dist
+              docker tag ghcr.io/mikailbag/$1:${{ github.event.release.tag_name }} ${{ secrets.CONTAINER_REGISTRY }}/$1:${{ github.event.release.tag_name }}
+              docker push ${{ secrets.CONTAINER_REGISTRY }}/$1:${{ github.event.release.tag_name }}
           }
           build agent
           build gc
