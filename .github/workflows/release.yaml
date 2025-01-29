@@ -1,0 +1,67 @@
+on:
+  release:
+    types:
+      # TODO: is this right?
+      - created
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: tespkg/actions-cache/restore@91b54a6e03abb8fcec12d3743633d23a1cfcd269
+        with:
+          endpoint: storage.yandexcloud.net
+          accessKey: ${{ secrets.CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.CACHE_SECRET_KEY }}
+          bucket: ${{ secrets.CACHE_BUCKET }}
+          # Don't bother trying github cache, we don't fit in its 10GB limit
+          use-fallback: false
+          key: v1-${{ github.sha }}
+          restore-keys: |
+            v1-
+          path: ~/.ya/build
+      - name: Build binaries
+        run: |
+          ./ya make -r --musl -DSTRIP ./perforator/bundle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: ./perforator/bundle
+  release-cli:
+    runs-on: ubuntu-24.04
+    needs:
+      - build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: binaries
+      - name: Attach binaries to release
+        run: |
+          gh -R ${{ github.repository }} release upload ${{ github.event.release.tag_name }} ./cli ./migrate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release-images:
+    runs-on: ubuntu-24.04
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: binaries
+          path: dist
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Build and push images
+        run: |
+          function build {
+              docker build -f perforator/deploy/docker/Dockerfile.prebuilt --target $1 --push --tag ghcr.io/mikailbag/$1:${{ github.event.release.tag_name }} ./dist
+          }
+          build agent
+          build gc
+          build migrate
+          build offline_processing
+          # build proxy
+          build storage
+          build web
+
