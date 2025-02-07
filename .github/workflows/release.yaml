@@ -101,7 +101,7 @@ jobs:
           ~/yandex-cloud/bin/yc container registry configure-docker
       - name: Build and push images
         run: |
-          exprt PATH=~/yandex-cloud/bin:${PATH}
+          expщrt PATH=~/yandex-cloud/bin:${PATH}
           mv ./create_llvm_prof ./dist/
           chmod +x ./dist/create_llvm_prof
           function build {
