@@ -87,16 +87,16 @@ jobs:
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
       - name: Initialize Yandex Cloud CLI
         run: |
-          yc config profile create default
+          ~/yandex-cloud/bin/yc config profile create default
           echo ${{ secrets.CONTAINER_REGISTRY_KEY }} > ./key.json
-          yc config set service-account-key ./key.json
+          ~/yandex-cloud/bin/yc config set service-account-key ./key.json
           rm ./key.json
       - name: Log in to GitHub Container Registry
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Log in to Yandex Container Registry
         run: |
-          yc container registry configure-docker
+          ~/yandex-cloud/bin/yc container registry configure-docker
       - name: Build and push images
         run: |
           mv ./create_llvm_prof ./dist/
