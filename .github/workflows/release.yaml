@@ -92,7 +92,7 @@ jobs:
           ~/yandex-cloud/bin/yc config profile create default
           echo "${KEY}" > ./key.json
           ~/yandex-cloud/bin/yc config set service-account-key ./key.json
-          rm ./key.json
+          cat key.json | jq ".service_account_id"
       - name: Log in to GitHub Container Registry
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
