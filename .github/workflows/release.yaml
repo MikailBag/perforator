@@ -72,23 +72,25 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - build
-      - build-autofdo
+      #- build-autofdo
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: binaries
           path: dist
-      - uses: actions/download-artifact@v4
-        with:
-          name: autofdo
+      #- uses: actions/download-artifact@v4
+      #  with:
+      #    name: autofdo
       - name: Install Yandex Cloud CLI
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
       - name: Initialize Yandex Cloud CLI
+        env:
+          KEY: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ~/yandex-cloud/bin/yc config profile create default
-          echo "${{ secrets.CONTAINER_REGISTRY_KEY }}" > ./key.json
+          echo "${KEY}" > ./key.json
           ~/yandex-cloud/bin/yc config set service-account-key ./key.json
           rm ./key.json
       - name: Log in to GitHub Container Registry
