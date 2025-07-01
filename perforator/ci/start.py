@@ -45,4 +45,4 @@ response = response.json()
 print(f"Build successfully started, id={response['build_id']}, execution_id={response['execution_id']}")
 
 with open("./build-id", 'w') as f:
-    f.write(response['id'])
+    f.write(response['build_id'])
