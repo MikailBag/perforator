@@ -27,6 +27,7 @@ upload_resp = requests.post(
     presigned['url'],
     data=presigned['fields'],
     files={'file': ('file', open(os.environ['ARCHIVE_PATH'], 'rb'))},
+    timeout=300,
 )
 if upload_resp.status_code != 204:
     print(upload_resp.text)
