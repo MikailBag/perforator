@@ -3,6 +3,10 @@ on:
     types:
       # TODO: is this right?
       - created
+permissions:
+  contents: write
+  attestations: write
+  packages: write
 jobs:
   build:
     runs-on: ubuntu-24.04
