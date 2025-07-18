@@ -41,15 +41,20 @@ jobs:
             IAM_TOKEN=$(curl --fail -sH "Content-Type: application/x-www-form-urlencoded" -d "grant_type=urn:ietf:params:oauth:grant-type:token-exchange&requested_token_type=urn:ietf:params:oauth:token-type:access_token&audience=$SA_ID&subject_token=${ID_TOKEN}&subject_token_type=urn:ietf:params:oauth:token-type:id_token" -X POST https://auth.yandex.cloud/oauth/token | jq -r '.access_token')
             echo "::add-mask::${IAM_TOKEN}"
             echo "token=${IAM_TOKEN}" >> $GITHUB_OUTPUT
-      - name: Start remote build
+      - name: Run build
         env:
             IAM_TOKEN: ${{ steps.iam_token.outputs.token }}
-            START_FUNC_URL: ${{ vars.START_BUILD_FUNCTION_URL }}
-            UPLOAD_FUNC_URL: ${{ vars.UPLOAD_URL_FUNCTION_URL }}
+            CREATE_VM_URL: ${{ vars.START_BUILD_FUNCTION_URL }}
+            POLL_VM_URL: ${{ vars.POLL_BUILD_FUNCTION_URL }}
             RUN_ID: ${{ github.run_id }}
             REPO_ID: ${{ github.repository_id }}
-            ARCHIVE_PATH: ./code.tar.gz 
-        run: python3 configs/perforator/ci/start.py
+            ARCHIVE_PATH: ./code.tar.gz
+            SCRIPT_PATH: code/perforator/ci/build.sh
+            OUT_PATH: out
+            LOCAL_WORK_DIR: work
+        run: |
+          mkdir work
+          go run configs/perforator/internal/ci-tools
            
             
 
