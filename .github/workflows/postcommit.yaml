@@ -54,7 +54,7 @@ jobs:
             LOCAL_WORK_DIR: work
         run: |
           mkdir work
-          (cd ./configs/perforator/internal/ci-rools && go build .)
+          (cd ./configs/perforator/internal/ci-tools && go build .)
           ./configs/perforator/internal/ci-tools/ci-tools
            
             
