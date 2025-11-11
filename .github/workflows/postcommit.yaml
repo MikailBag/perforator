@@ -2,7 +2,7 @@ name: Postcommit checks
 on:
   push:
     branches:
-      - main
+      - mainn
 permissions: {} # disable all by default
 jobs:
   run-build:
