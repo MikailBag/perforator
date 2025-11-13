@@ -32,7 +32,7 @@ jobs:
           path: ./perforator/bundle
       - name: Build binaries (arm64)
         run: |
-          ./ya make --target-platform default-linux-arm64 -r --musl --gc ./perforator/bundle
+          ./ya make --target-platform default-linux-aarch64 -r --musl --gc ./perforator/bundle
       - uses: actions/upload-artifact@v4
         with:
           name: binaries-arm64
