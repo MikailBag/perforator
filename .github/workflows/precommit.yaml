@@ -1,9 +1,5 @@
 on:
-<<<<<<< HEAD
-  - workflow_dispatch # TODO(mikailbag): address approval concerns and bring this back
-=======
   - pull_request_target
->>>>>>> fb922a027 (better)
 permissions: {} # disable all by default
 jobs:
   run-build:
